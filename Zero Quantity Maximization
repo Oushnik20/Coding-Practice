@@ -1,0 +1,76 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+
+    static class Pair {
+        long num, den;
+        Pair(long num, long den) {
+            this.num = num;
+            this.den = den;
+        }
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Pair)) return false;
+            Pair p = (Pair) o;
+            return num == p.num && den == p.den;
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(num, den);
+        }
+    }
+
+    static long gcd(long a, long b) {
+        if (b == 0) return Math.abs(a);
+        return gcd(b, a % b);
+    }
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine().trim());
+
+        String[] sa = br.readLine().split(" ");
+        String[] sb = br.readLine().split(" ");
+
+        long[] a = new long[n];
+        long[] b = new long[n];
+
+        for (int i = 0; i < n; i++) a[i] = Long.parseLong(sa[i]);
+        for (int i = 0; i < n; i++) b[i] = Long.parseLong(sb[i]);
+
+        Map<Pair, Integer> map = new HashMap<>();
+        int alwaysZero = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (a[i] == 0) {
+                if (b[i] == 0) {
+                    alwaysZero++;
+                }
+                // else: never zero, ignore
+            } else {
+                long num = -b[i];
+                long den = a[i];
+                long g = gcd(Math.abs(num), Math.abs(den));
+                num /= g;
+                den /= g;
+
+                if (den < 0) { // normalize sign
+                    den = -den;
+                    num = -num;
+                }
+
+                Pair key = new Pair(num, den);
+                map.put(key, map.getOrDefault(key, 0) + 1);
+            }
+        }
+
+        int best = 0;
+        for (int val : map.values()) {
+            best = Math.max(best, val);
+        }
+
+        System.out.println(best + alwaysZero);
+    }
+}
